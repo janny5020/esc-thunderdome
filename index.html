@@ -409,8 +409,7 @@ const FIREBASE_CONFIG = {
 
 function connectToGame(){
   document.getElementById('connecting').style.display='none';
-  document.getElementById('screen-setup').classList.remove('active');
-  document.getElementById('screen-join').classList.add('active');
+  showScreen('join');
   listenToGame();
 }
 
