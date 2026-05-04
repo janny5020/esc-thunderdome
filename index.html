@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ESC Thunderdome v3 - Firebase Edition -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -261,34 +262,10 @@ textarea:focus{outline:none;border-color:var(--green);}
   <div class="t-sub" id="t-sub">Get ready…</div>
 </div>
 
-<!-- ══ SETUP SCREEN ══ -->
-<div class="screen active" id="screen-setup">
-  <div class="setup-card">
-    <div style="font-size:32px;margin-bottom:8px;">⚙️</div>
-    <h2>One-time Firebase Setup</h2>
-    <p>This game needs a free Firebase project for real-time sync. This only takes 2 minutes and you only do it once.</p>
-    <ol>
-      <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
-      <li>Click <strong>Add project</strong> → name it anything → click through</li>
-      <li>In the left sidebar click <strong>Build → Realtime Database</strong></li>
-      <li>Click <strong>Create Database</strong> → choose any location → select <strong>Start in test mode</strong></li>
-      <li>In the left sidebar click <strong>Project Settings</strong> (gear icon) → scroll to "Your apps" → click <strong>&lt;/&gt; Web</strong></li>
-      <li>Register the app (any nickname) → copy the <code>firebaseConfig</code> values below</li>
-    </ol>
-    <div class="cfg-label">Database URL <span style="color:var(--cardinal);">*</span></div>
-    <input class="cfg-input" id="cfg-dburl" placeholder="https://your-project-default-rtdb.firebaseio.com"/>
-    <div class="cfg-label">API Key <span style="color:var(--cardinal);">*</span></div>
-    <input class="cfg-input" id="cfg-apikey" placeholder="AIzaSy..."/>
-    <div class="cfg-label">Project ID <span style="color:var(--cardinal);">*</span></div>
-    <input class="cfg-input" id="cfg-projectid" placeholder="your-project-id"/>
-    <div class="cfg-err" id="cfg-err"></div>
-    <button class="btn btn-fox btn-full" onclick="initFirebase()">Connect & Launch 🚀</button>
-    <p style="font-size:11px;color:var(--muted);margin-top:12px;">Your config is saved in your browser for next time.</p>
-  </div>
-</div>
+<!-- setup screen removed — Firebase is hardcoded -->
 
 <!-- ══ JOIN SCREEN ══ -->
-<div class="screen" id="screen-join">
+<div class="screen active" id="screen-join">
   <div class="join-card">
     <div style="font-size:44px;margin-bottom:8px;">🔥</div>
     <h1>ESC Offsite<br>Hot Take Thunderdome</h1>
@@ -404,7 +381,6 @@ textarea:focus{outline:none;border-color:var(--green);}
 //  CONFIG + FIREBASE INIT
 // ══════════════════════════════════════════════
 const HOST_PW = "janicelandia15220";
-const CFG_KEY = "thunderdome_fb_config";
 
 let db = null;
 let myId = 'p_' + Math.random().toString(36).slice(2,9);
@@ -420,26 +396,16 @@ let players = {};
 let takes = [];
 let votes = {};
 
-function savedConfig(){
-  try{ return JSON.parse(localStorage.getItem(CFG_KEY)||'null'); }catch(e){ return null; }
-}
-
-function initFirebase(){
-  const dbUrl = document.getElementById('cfg-dburl').value.trim();
-  const apiKey = document.getElementById('cfg-apikey').value.trim();
-  const projectId = document.getElementById('cfg-projectid').value.trim();
-  const errEl = document.getElementById('cfg-err');
-  if(!dbUrl||!apiKey||!projectId){ errEl.textContent='Please fill in all three fields.'; return; }
-  errEl.textContent='';
-  const cfg = { apiKey, projectId, databaseURL: dbUrl };
-  try{
-    if(!firebase.apps.length) firebase.initializeApp(cfg);
-    else firebase.app();
-    db = firebase.database();
-    localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
-    connectToGame();
-  }catch(e){ errEl.textContent='Firebase error: '+e.message; }
-}
+// ── HARDCODED CONFIG — no setup screen needed ──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDFfcPTQ6OkwDb71ybGoR2t2E0iBL9k0-Y",
+  authDomain: "esc-thunderdome.firebaseapp.com",
+  databaseURL: "https://esc-thunderdome-default-rtdb.firebaseio.com",
+  projectId: "esc-thunderdome",
+  storageBucket: "esc-thunderdome.firebasestorage.app",
+  messagingSenderId: "517250426905",
+  appId: "1:517250426905:web:d34f14437288736488e288"
+};
 
 function connectToGame(){
   document.getElementById('connecting').style.display='none';
@@ -449,15 +415,13 @@ function connectToGame(){
 }
 
 function tryAutoConnect(){
-  const cfg = savedConfig();
-  if(!cfg){ document.getElementById('connecting').style.display='none'; return; }
   try{
-    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.database();
     connectToGame();
   }catch(e){
-    localStorage.removeItem(CFG_KEY);
     document.getElementById('connecting').style.display='none';
+    alert('Firebase connection failed: ' + e.message);
   }
 }
 
